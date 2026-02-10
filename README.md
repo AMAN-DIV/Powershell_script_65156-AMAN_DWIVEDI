@@ -146,8 +146,9 @@ if ($disk.FreeSpace -lt 5GB) {
 else {
     Write-Output "Sufficient disk space"
 }
-
+=================================================================================================================
 ----------->>
+
 PS C:\WINDOWS\system32> $disk = Get-CimInstance Win32_LogicalDisk -Filter "DeviceID='C:'"
 >>
 >> if ($disk.FreeSpace -lt 5GB) {
@@ -159,5 +160,62 @@ PS C:\WINDOWS\system32> $disk = Get-CimInstance Win32_LogicalDisk -Filter "Devic
 >> }
 >>
 Sufficient disk space
+------------------------------------------------------------------------------------------------------
+
+
+**Enterprise Deployment Script**
+
+
+# ===============================
+# SAFE PRACTICE SCRIPT
+# No installation / No system changes
+# ===============================
+
+# Log setup (safe)
+$logDir = "$env:TEMP\Logs"
+$log = "$logDir\AppDeploy_Practice.log"
+
+if (-not (Test-Path $logDir)) {
+    New-Item -ItemType Directory -Path $logDir -Force | Out-Null
+}
+
+"Script started (Practice Mode): $(Get-Date)" | Out-File $log -Append
+
+# ===============================
+# Detection Phase (READ-ONLY)
+# ===============================
+$app = Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" |
+       Where-Object { $_.DisplayName -like "7-Zip*" }
+
+if ($app) {
+    "Detection: 7-Zip is already installed" | Out-File $log -Append
+}
+else {
+    "Detection: 7-Zip is NOT installed" | Out-File $log -Append
+}
+
+# ===============================
+# Validation Phase (READ-ONLY)
+# ===============================
+$disk = Get-CimInstance Win32_LogicalDisk -Filter "DeviceID='C:'"
+
+if ($disk.FreeSpace -lt 5GB) {
+    "Validation: Insufficient disk space" | Out-File $log -Append
+}
+else {
+    "Validation: Sufficient disk space" | Out-File $log -Append
+}
+
+# ===============================
+# Install Phase (SIMULATED)
+# ===============================
+"Installation phase skipped (Practice Mode)" | Out-File $log -Append
+
+# ===============================
+# Completion
+# ===============================
+"Script completed safely: $(Get-Date)" | Out-File $log -Append
+
+Write-Output "Practice script executed successfully. Log saved at: $log"
 
 
