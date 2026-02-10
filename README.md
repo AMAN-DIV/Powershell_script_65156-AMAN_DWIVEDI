@@ -90,3 +90,74 @@ Correct & safe way (PowerShell requires a secure password):
 
 $Password = ConvertTo-SecureString "P@ssw0rd!" -AsPlainText -Force
 New-LocalUser -Name "JohnDoe" -Password $Password -Description "IT Support"
+
+
+
+========================================================
+
+
+Step 1: Create the folder first
+
+Run this once:
+
+New-Item -ItemType Directory -Path "C:\Logs" -Force
+
+
+Step 2: Run your logging script again
+$log = "C:\Logs\AppInstall.log"
+
+"Installation started: $(Get-Date)" | Out-File $log -Append
+
+Start-Process "msiexec.exe" -ArgumentList "/i app.msi /qn" -Wait
+
+"Installation completed: $(Get-Date)" | Out-File $log -Append
+
+
+--------------------DEMO_---------------------
+PS C:\WINDOWS\system32> New-Item -ItemType Directory -Path "C:\Logs" -Force
+>>
+
+
+    Directory: C:\
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d-----         2/10/2026   1:36 PM                Logs
+
+
+PS C:\WINDOWS\system32> "Installation started: $(Get-Date)" | Out-File $log -Append
+>>
+PS C:\WINDOWS\system32> Start-Process "msiexec.exe" -ArgumentList "/i app.msi /qn" -Wait
+>>
+PS C:\WINDOWS\system32> "Installation completed: $(Get-Date)" | Out-File $log -Append
+>>
+PS C:\WINDOWS\system32>
+
+==========================================================================================================
+**Disk Space Validation (PowerShell)**
+
+$disk = Get-CimInstance Win32_LogicalDisk -Filter "DeviceID='C:'"
+
+if ($disk.FreeSpace -lt 5GB) {
+    Write-Output "Insufficient disk space"
+    exit 1
+}
+else {
+    Write-Output "Sufficient disk space"
+}
+
+----------->>
+PS C:\WINDOWS\system32> $disk = Get-CimInstance Win32_LogicalDisk -Filter "DeviceID='C:'"
+>>
+>> if ($disk.FreeSpace -lt 5GB) {
+>>     Write-Output "Insufficient disk space"
+>>     exit 1
+>> }
+>> else {
+>>     Write-Output "Sufficient disk space"
+>> }
+>>
+Sufficient disk space
+
+
